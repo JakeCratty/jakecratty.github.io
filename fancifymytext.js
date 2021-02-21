@@ -5,12 +5,11 @@ let biggerbBtn = document.querySelector("button")
 let mooBtn = document.getElementById("MooBtn")
 let fancyRadio = document.getElementById("fancy")
 let boringRadio = document.getElementById("normal")
-let text = document.getElementById("Text");
+let text = document.getElementById("fancytextarea");
 
 biggerbBtn.onclick = function() {
   alert("hello, world!")
   text.style.fontSize = "2em";
-  text.textContent = text.textContent;
 }
 
 fancyRadio.onchange = function()  {
@@ -18,7 +17,6 @@ fancyRadio.onchange = function()  {
   text.style.fontWeight = "bold";
   text.style.color = "blue";
   text.style.textDecoration = "underline";
-  text.textContent = text.textContent;
 }
 
 boringRadio.onchange = function() {
@@ -28,8 +26,8 @@ boringRadio.onchange = function() {
 }
 
 mooBtn.onclick = function() {
-  let textString = text.textContent
+  let textString = text.value;
   let sentences = textString.split(".")
   textString = sentences.join("-moo.")
-  text.textContent = textString.toUpperCase()
+  text.value = textString
 }
