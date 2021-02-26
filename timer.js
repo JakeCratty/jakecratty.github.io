@@ -8,12 +8,14 @@ let goBtn = document.getElementById("GoBtn")
 let outputParagraph = document.getElementById("outputArea")
 let outputSpeedSlider = document.getElementById("timeInMillis")
 let outputSpeed = document.getElementById("outputSpeed")
-let intv
 let printingText = false
+let inputText
+let intv
 
 submitBtn.onclick = function()
 {
     inputTextField.style.backgroundColor = "lightgreen"
+    inputText = inputTextField.value
 }
 
 let onTextFieldChange = function()
@@ -29,7 +31,7 @@ let start = function()
 goBtn.onclick = function()
 {
     let index = 0
-    let text = inputTextField.value
+    let text = inputText
     let intervalSpeed = outputSpeedSlider.value
     clearInterval(intv)
 
