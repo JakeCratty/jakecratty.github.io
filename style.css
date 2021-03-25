@@ -1,0 +1,50 @@
+/*
+ * This is the stylesheet for index.html
+ */
+
+ @import url('https://fonts.googleapis.com/css?family=Inconsolata|Oxygen');
+ body {
+    background-color: #202020;
+    color: white;
+    text-align: center;
+  }
+
+  div.Section {
+    min-height: 6em;
+  }
+
+  div#section-a {
+    background-color: aquamarine;
+    height: 100%;
+    width: 100%;
+    min-height: 10em;
+  }
+
+  div#section-b {
+    justify-content: center;
+    justify-content: space-around;
+  }
+
+  h1 {
+    font-family: "Inconsolata", serif;
+    font-size: 3em;
+    text-align: center;
+  }
+
+  h2 {
+      font-family: "Oxygen";
+      font-size: 2em;
+  }
+
+  fieldset {
+    border-width: 10px;
+    width: 80%;
+  }
+
+  fieldset.project-list {
+    display: grid 1fr 1fr 1fr;
+    height: auto;
+    width: 40%;
+  }
+
+
