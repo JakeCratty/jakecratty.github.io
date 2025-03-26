@@ -12,7 +12,7 @@ function setup()
 {
     p5.disableFriendlyErrors = true;
     var cnv = createCanvas(windowWidth, windowHeight);
-    if(windowHeight < 500 || windowWidth < 500)){
+    if(windowHeight < 500 || windowWidth < 500){
         onMobile = true
         numParticles = 50
     }
