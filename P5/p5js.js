@@ -3,12 +3,15 @@ var b;
 var ballList = [];
 var particleList = [];
 var time = 0;
+let startTime = Date.now()
+let deltaTime = 0
+let ballTotal = 0
 function setup()
 {
     var cnv = createCanvas(windowWidth, windowHeight);
     cnv.style('display', 'block')
     background(0)
-    for(i = 0; i < 25; i++)
+    for(i = 0; i < 3; i++)
         ballList.push(new Ball())
 }
 
@@ -21,9 +24,32 @@ function draw()
         particle.show()
         particle.move()
     });
-    if(time % 100 == 0){
-        ballList.push(new Ball())
+
+    particleList = particleList.filter(particle => particle.lifetime > 0)
+    console.log("Particle list size: " + particleList.length)
+
+    if(ballList.length>0){
+        if(time % 100 == 0){
+            ballList.push(new Ball())
+        }
+
+        deltaTime = Date.now() - startTime 
+    }else{
+        textSize(32)
+        fill('purple')
+        stroke(0)
+        strokeWeight(2)
+        text("Bubbles Popped: " + ballTotal, windowWidth/2-50, windowHeight/2)
     }
+    textSize(24)
+    fill(255)
+    stroke(0)
+    strokeWeight(2)
+    text("Time: " + truncate(deltaTime/1000), 100, 100)
+}
+
+function truncate(time){
+    return time
 }
 
 function update(b)
@@ -77,25 +103,30 @@ class Particle{
         this.dir = createVector(this.x, this.y).sub(createVector(x, y)).normalize()
         this.lifetime = 255
         this.speed = 5
+        this.speedMod = random(0.95, 0.99)
         console.log("Creating new particle with diameter: " + this.diameter)
     }
     move(){
         this.lifetime-=3;
         this.x += this.dir.x * this.speed
         this.y += this.dir.y * this.speed
-        this.speed *= 0.98
+        this.speed *= this.speedMod
     }
     show(){
+        if(this.speed < 0.5)
+        {
+            this.lifetime = 0
+        }
         this.color.setAlpha(this.lifetime)
         let strokeColor = color(0)
         strokeColor.setAlpha(this.lifetime)
         stroke(strokeColor)
+        noStroke()
         fill(this.color)
         ellipse(this.x, this.y, this.diameter, this.diameter)
     }
 }
 
-let ballTotal = 0
 class Ball
 {
 
@@ -123,10 +154,13 @@ class Ball
             this.y+=this.yspeed
         else
             this.y-=this.yspeed
+
         if(this.isMovingRight)
             this.x+=this.xspeed
         else
             this.x-=this.xspeed
+
+
         if(this.x+this.diameter/2>=windowWidth)
             this.isMovingRight = false;
         if(this.x-this.diameter/2<=0)
