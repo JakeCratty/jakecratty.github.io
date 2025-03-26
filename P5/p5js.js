@@ -8,6 +8,7 @@ let deltaTime = 0
 let ballTotal = 0
 function setup()
 {
+    p5.disableFriendlyErrors = true;
     var cnv = createCanvas(windowWidth, windowHeight);
     cnv.style('display', 'block')
     background(0)
@@ -26,7 +27,6 @@ function draw()
     });
 
     particleList = particleList.filter(particle => particle.lifetime > 0)
-    console.log("Particle list size: " + particleList.length)
 
     if(ballList.length>0){
         if(time % 100 == 0){
@@ -104,7 +104,6 @@ class Particle{
         this.lifetime = 255
         this.speed = 5
         this.speedMod = random(0.95, 0.99)
-        console.log("Creating new particle with diameter: " + this.diameter)
     }
     move(){
         this.lifetime-=3;
@@ -142,7 +141,6 @@ class Ball
         let r = random(255)
         let g = random(255)
         let b = random(255)
-        console.log(r)
         this.color = color(r,g,b)
         this.id = ballTotal;
         ballTotal++;
