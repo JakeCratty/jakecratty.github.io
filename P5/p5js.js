@@ -6,10 +6,16 @@ var time = 0;
 let startTime = Date.now()
 let deltaTime = 0
 let ballTotal = 0
+let onMobile = false
+let numParticles = 100
 function setup()
 {
     p5.disableFriendlyErrors = true;
     var cnv = createCanvas(windowWidth, windowHeight);
+    if(windowHeight < 500 || windowWidth < 500)){
+        onMobile = true
+        numParticles = 50
+    }
     cnv.style('display', 'block')
     background(0)
     for(i = 0; i < 3; i++)
@@ -86,7 +92,7 @@ function mouseClicked(){
 }
 
 function particleEffect(ball){
-    for(i = 0; i < 100; i++){
+    for(i = 0; i < numParticles; i++){
         particleList.push(new Particle(ball.x, ball.y, ball.color, ball.diameter))
     }
 }
