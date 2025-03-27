@@ -18,7 +18,7 @@ function setup()
     }
     cnv.style('display', 'block')
     background(0)
-    for(i = 0; i < 3; i++)
+    for(i = 0; i < 15; i++)
         ballList.push(new Ball())
 }
 
