@@ -18,6 +18,14 @@
 	<!-- <div class="footer">
 		<p><a href="index.html">Home</a></p>
 	</div> -->
-    <script src="p5js.js?v=1.5"></script>
+	<script>
+		const params = new URLSearchParams(window.location.search);
+		const sketchPath = params.get('project');
+		if(sketchPath){
+			const script = document.createElement('script');
+			script.src = sketchPath + '/sketch.js';
+			document.body.appendChild(script);
+		}
+	</script>
 	</body>
 </html>
