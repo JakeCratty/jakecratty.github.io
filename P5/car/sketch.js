@@ -1,7 +1,15 @@
 let car;
-
+let basePath;
 function preload(){
-    car = loadImage('car.png')
+
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+      // Local environment
+      basePath = "/p5/";
+    } else {
+      // GitHub Pages environment
+      basePath = "/";
+    }
+    car = loadImage(basePath + "car/car.png")
 }
 
 function setup()
@@ -14,6 +22,8 @@ function setup()
     cnv.style('display', 'block')
     background(255)
     rectMode(CENTER)
+    imageMode(CENTER)
+    car.resize(100, 66)
 
 }
 
@@ -63,8 +73,9 @@ function draw()
     let angle = atan2(vertB.y-vertA.y, vertB.x-vertA.x)
 
     push()
-    translate(vectorList[4].x, vectorList[4].y-10)
+    translate(vectorList[4].x, vectorList[4].y-17)
     rotate(angle)
+    scale(-1, 1)
     image(car, 0, 0)
     pop()
     amt += 0.02
