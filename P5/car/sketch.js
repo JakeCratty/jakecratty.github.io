@@ -1,7 +1,7 @@
 let car;
 
 function preload(){
-    car = loadImage('car.png')
+    car = loadImage('P5/car/car.png')
 }
 
 function setup()
