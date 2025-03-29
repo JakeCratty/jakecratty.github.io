@@ -4,10 +4,10 @@ function preload(){
 
     if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
       // Local environment
-      basePath = "/p5/";
+      basePath = "/P5/";
     } else {
       // GitHub Pages environment
-      basePath = "/";
+      basePath = "/P5/";
     }
     car = loadImage(basePath + "car/car.png")
 }
