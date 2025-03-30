@@ -1,4 +1,6 @@
 let car;
+let carPos;
+let sun;
 let basePath;
 function preload(){
 
@@ -10,12 +12,14 @@ function preload(){
       basePath = "/P5/";
     }
     car = loadImage(basePath + "car/car.png")
+    sun = loadImage(basePath + "car/sun.png")
 }
 
+let mainRoad, bgRoad1
 function setup()
 {
     p5.disableFriendlyErrors = true;
-    var cnv = createCanvas(windowWidth, windowHeight);
+    var cnv = createCanvas(windowWidth, windowHeight, WEBGL);
     if(windowHeight < 500 || windowWidth < 500){
         onMobile = true
     }
@@ -24,6 +28,10 @@ function setup()
     rectMode(CENTER)
     imageMode(CENTER)
     car.resize(100, 66)
+    sun.resize(150, 150)
+
+    mainRoad = new Terrain(0.002, 400, 200, 3, color(112, 89, 70), color(173, 125, 85), 5)
+    bgRoad1 = new Terrain(0.004, 600, 0, 1.5, color(100,60,50), color(150, 100, 65), 25)
 
 }
 
@@ -35,58 +43,129 @@ function draw()
 {    
     background(177, 218, 252)
 
+    bgRoad1.updateTerrain()
+    bgRoad1.draw()
     //generate vertices for main path
-    vectorList = []
-    for(i = -25; i < windowWidth+25; i+=25){
-        let x = i + shift
-        fill(0)
-        stroke(0)
-        strokeWeight(1)
-        let y = noise(x*0.002)*200 + 500
-        vectorList.push(createVector(i - (windowWidth/2*0), y))
-    }
-    shift += 3
+    mainRoad.updateTerrain()
     
     //draw main path
-    stroke(112, 89, 70)
-    strokeWeight(7)
-    fill(173, 125, 85)
-    beginShape(TESS)
-        for(let v of vectorList){
-            vertex(v.x, v.y)
-        }
-        vertex(windowWidth, windowHeight)
-        vertex(0, windowHeight)
-        vertex(vectorList[0].x, vectorList[0].y)
-    endShape(CLOSE)
+    mainRoad.draw()
 
-    fill(100, 250, 60)
-    stroke(0)
-    strokeWeight(2)
+    //update and draw the car
+    drawCar()
 
-    //get angle between vert 4 and 5
-    stroke(0)
-    strokeWeight(5)
-    vertA = vectorList[3]
-    vertB = vectorList[6]
-    //line(vertA.x, vertA.y, vertB.x, vertB.y)
-    let angle = atan2(vertB.y-vertA.y, vertB.x-vertA.x)
-
-    push()
-    translate(vectorList[4].x, vectorList[4].y-17)
-    rotate(angle)
-    scale(-1, 1)
-    image(car, 0, 0)
-    pop()
-    amt += 0.02
+    //draw exhaust
+    updateExhaust()
+    drawExhaust()    
+    
+    //draw the sun
+    //drawSun()
 }
 
+class Terrain{
+    constructor(granularity, scale, yOffset, scrollSpeed, strokeColor, fillColor, vectorDist){
+        this.granularity = granularity
+        this.scale = scale
+        this.yOffset = yOffset
+        this.scrollSpeed = scrollSpeed;
+        this.color = color
+        this.vectorList = []
+        this.shift = 0
+        this.strokeColor = strokeColor
+        this.fillColor = fillColor
+        this.vectorDist = vectorDist
+    }
+
+    updateTerrain(){
+        this.vectorList = []
+        for(let i = -25; i < windowWidth+25; i+=this.vectorDist){
+            let x = i + this.shift
+            let y = noise(x*this.granularity)*this.scale + this.yOffset
+            this.vectorList.push(createVector(i, y))
+        }
+        this.shift += this.scrollSpeed
+    }
+
+    draw(){
+        stroke(this.strokeColor)
+        strokeWeight(7)
+        fill(this.fillColor)
+        beginShape(TESS)
+            for(let v of this.vectorList){
+                vertex(v.x, v.y)
+            }
+            vertex(windowWidth, windowHeight)
+            vertex(0, windowHeight)
+            vertex(this.vectorList[0].x, this.vectorList[0].y)
+        endShape(CLOSE)
+    }
+}
+
+function drawCar(){
+    //get angle between vert before and after car
+    vertA = mainRoad.vectorList[20]
+    vertB = mainRoad.vectorList[30]
+    //line(vertA.x, vertA.y, vertB.x, vertB.y)
+    let angle = atan2(vertB.y-vertA.y, vertB.x-vertA.x)
+    carPos = createVector(mainRoad.vectorList[25].x, mainRoad.vectorList[25].y-19)
+    
+    //draw the car
+    push()
+        translate(carPos.x, carPos.y)
+        rotate(angle)
+        scale(-1, 1)
+        image(car, 0, 0)
+    pop()
+}
+
+function drawSun(){
+    push()
+        translate(windowWidth-100, 80)
+        rotate(amt)
+        image(sun, 0, 0)
+    pop()
+    amt += 0.001
+}
 function windowResized()
 {
     resizeCanvas(windowWidth, windowHeight);
 }
 
-function mouseClicked(){
+let time = 0
+let particles = []
+function updateExhaust(){
+    particleSpawn = createVector(carPos.x-car.width/2, carPos.y+8)
+    particleSize = 6
+    if(time % 15 == 0){
+        particles.push(new Particle(particleSpawn, particleSize))
+    }
+    time++
+}
+function drawExhaust(){
+    for(particle of particles){
+        particle.update()
+        particle.draw()
+    }
+    particles = particles.filter(particle => particle.alpha > 0)
+}
 
+class Particle {
+    constructor(pos, size){
+        this.pos = pos.copy()
+        this.size = size
+        this.alpha = 255
+    }
 
+    update(){
+        this.pos.y -= 1
+        this.pos.x -= 0.8
+        this.alpha -= 5
+    }
+
+    draw(){
+        stroke(80, this.alpha)
+        strokeWeight(1)
+        noFill()
+        ellipse(this.pos.x, this.pos.y, this.size, this.size)
+    }
 }
