@@ -57,8 +57,6 @@ function draw()
     }
     //generate vertices for main path
     mainRoad.updateTerrain()
-    
-    //draw main path
     mainRoad.draw()
 
     //update and draw the car
@@ -73,6 +71,7 @@ function draw()
 
     fill(0)
     textSize(24)
+    noStroke()
     text("FPS: " + frameRate().toFixed(2), 50, 50)
 }
 
@@ -88,23 +87,35 @@ class Terrain{
         this.strokeColor = strokeColor
         this.fillColor = fillColor
         this.vectorDist = vectorDist
+        this.initTerrain()
+    }
+
+    initTerrain(){
+        for(let x = -25; x < windowWidth+25; x+=this.vectorDist){
+            let y = noise(x*this.granularity)*this.scale + this.yOffset
+            this.vectorList.push(createVector(x, y))
+        }
+        console.log("Init terrain: " + this.vectorList.length + " vertices")
     }
 
     updateTerrain(){
-        this.vectorList = []
-        for(let i = -25; i < windowWidth+25; i+=this.vectorDist){
-            let x = i + this.shift
-            let y = noise(x*this.granularity)*this.scale + this.yOffset
-            this.vectorList.push(createVector(i, y))
-        }
+        this.vectorList = this.vectorList.filter(v => v.x > -25)
         this.shift += this.scrollSpeed
+        while(this.vectorList[this.vectorList.length-1].x < windowWidth+25){
+            let x = this.vectorList[this.vectorList.length-1].x + this.vectorDist
+            let y = noise((x + this.shift)*this.granularity)*this.scale + this.yOffset
+            this.vectorList.push(createVector(x, y))
+        }
+
+        for(let v of this.vectorList){
+            v.x -= this.scrollSpeed
+        }
     }
 
     draw(){
         stroke(this.strokeColor)
-        strokeWeight(7)
+        strokeWeight(2)
         fill(this.fillColor)
-        noStroke()
         beginShape(TESS)
             for(let v of this.vectorList){
                 vertex(v.x, v.y)
