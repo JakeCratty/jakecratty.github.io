@@ -31,8 +31,10 @@ function setup()
     car.resize(100, 66)
     sun.resize(150, 150)
 
-    mainRoad = new Terrain(0.002, 400, 200, 3, color(112, 89, 70), color(173, 125, 85), 5)
-    bgRoad1 = new Terrain(0.004, 600, 0, 1.5, color(100,60,50), color(150, 100, 65), 5)
+    bgRoad1 = new Terrain(0.004, 600, 0, 1, color(80,50,40), color(150, 100, 65), 5)
+    bgRoad2 = new Terrain(0.002, 400, 200, 2, color(112, 89, 70), color(173, 125, 85), 5)
+    mainRoad = new Terrain(0.001, 200, 400, 5, color(100,60,50), color(190, 160, 125), 5)
+    fgRoad = new Terrain(0.001, 200, 500, 9, color(100,60,50), color(210, 180, 145), 5)
 
 }
 
@@ -42,11 +44,16 @@ let height = 500
 let amt = 0
 function draw()
 {    
-    background(177, 218, 252)
+    background(177, 218, 252)    
+    
+    //draw the sun
+    drawSun()
 
     if(showAll){
         bgRoad1.updateTerrain()
         bgRoad1.draw()   
+        bgRoad2.updateTerrain()
+        bgRoad2.draw()   
     }
     //generate vertices for main path
     mainRoad.updateTerrain()
@@ -59,10 +66,10 @@ function draw()
 
     //draw exhaust
     updateExhaust()
-    drawExhaust()    
-    
-    //draw the sun
-    drawSun()
+    drawExhaust()
+
+    fgRoad.updateTerrain()
+    fgRoad.draw()
 
     fill(0)
     textSize(24)
