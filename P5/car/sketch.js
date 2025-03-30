@@ -2,6 +2,7 @@ let car;
 let carPos;
 let sun;
 let basePath;
+let showAll = true
 function preload(){
 
     if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
@@ -19,7 +20,7 @@ let mainRoad, bgRoad1
 function setup()
 {
     p5.disableFriendlyErrors = true;
-    var cnv = createCanvas(windowWidth, windowHeight, WEBGL);
+    var cnv = createCanvas(windowWidth, windowHeight);
     if(windowHeight < 500 || windowWidth < 500){
         onMobile = true
     }
@@ -31,7 +32,7 @@ function setup()
     sun.resize(150, 150)
 
     mainRoad = new Terrain(0.002, 400, 200, 3, color(112, 89, 70), color(173, 125, 85), 5)
-    bgRoad1 = new Terrain(0.004, 600, 0, 1.5, color(100,60,50), color(150, 100, 65), 25)
+    bgRoad1 = new Terrain(0.004, 600, 0, 1.5, color(100,60,50), color(150, 100, 65), 5)
 
 }
 
@@ -43,8 +44,10 @@ function draw()
 {    
     background(177, 218, 252)
 
-    bgRoad1.updateTerrain()
-    bgRoad1.draw()
+    if(showAll){
+        bgRoad1.updateTerrain()
+        bgRoad1.draw()   
+    }
     //generate vertices for main path
     mainRoad.updateTerrain()
     
@@ -59,7 +62,11 @@ function draw()
     drawExhaust()    
     
     //draw the sun
-    //drawSun()
+    drawSun()
+
+    fill(0)
+    textSize(24)
+    text("FPS: " + frameRate().toFixed(2), 50, 50)
 }
 
 class Terrain{
@@ -90,6 +97,7 @@ class Terrain{
         stroke(this.strokeColor)
         strokeWeight(7)
         fill(this.fillColor)
+        noStroke()
         beginShape(TESS)
             for(let v of this.vectorList){
                 vertex(v.x, v.y)
@@ -99,6 +107,10 @@ class Terrain{
             vertex(this.vectorList[0].x, this.vectorList[0].y)
         endShape(CLOSE)
     }
+}
+
+function mouseClicked(){
+    showAll = !showAll
 }
 
 function drawCar(){
