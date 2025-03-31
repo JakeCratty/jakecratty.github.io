@@ -31,10 +31,10 @@ function setup()
     car.resize(100, 66)
     sun.resize(150, 150)
 
-    bgRoad1 = new Terrain(0.004, 600, 0, 1, color(80,50,40), color(150, 100, 65), 5)
-    bgRoad2 = new Terrain(0.002, 400, 200, 2, color(112, 89, 70), color(173, 125, 85), 5)
-    mainRoad = new Terrain(0.001, 200, 400, 5, color(100,60,50), color(190, 160, 125), 5)
-    fgRoad = new Terrain(0.001, 200, 500, 9, color(100,60,50), color(210, 180, 145), 5)
+    bgRoad1 = new Terrain(0.004, 600, 0, 1, color(80,50,40), color(150, 100, 65), 5, 30)
+    bgRoad2 = new Terrain(0.002, 400, 200, 2, color(112, 89, 70), color(173, 125, 85), 5, 40)
+    mainRoad = new Terrain(0.001, 200, 400, 5, color(100,60,50), color(190, 160, 125), 5, 50)
+    fgRoad = new Terrain(0.001, 200, 500, 9, color(100,60,50), color(210, 180, 145), 5, 55)
 
 }
 
@@ -76,7 +76,7 @@ function draw()
 }
 
 class Terrain{
-    constructor(granularity, scale, yOffset, scrollSpeed, strokeColor, fillColor, vectorDist){
+    constructor(granularity, scale, yOffset, scrollSpeed, strokeColor, fillColor, vectorDist, frameOffset){
         this.granularity = granularity
         this.scale = scale
         this.yOffset = yOffset
@@ -87,11 +87,20 @@ class Terrain{
         this.strokeColor = strokeColor
         this.fillColor = fillColor
         this.vectorDist = vectorDist
-        this.initTerrain()
+        this.frameOffset = frameOffset
+        
+        this.buffer = createGraphics(windowWidth, windowHeight);
+        //this.buffer.noStroke();
+        this.buffer.strokeWeight(7)
+        this.buffer.stroke(this.strokeColor)
+        this.buffPos = createVector(windowWidth/2, windowHeight/2)
+        this.time = 0
+        this.initTerrain();
+        this.updateBuffer();
     }
 
     initTerrain(){
-        for(let x = -25; x < windowWidth+25; x+=this.vectorDist){
+        for(let x = -25; x < windowWidth+(this.scrollSpeed*this.frameOffset); x+=this.vectorDist){
             let y = noise(x*this.granularity)*this.scale + this.yOffset
             this.vectorList.push(createVector(x, y))
         }
@@ -104,26 +113,43 @@ class Terrain{
         while(this.vectorList[this.vectorList.length-1].x < windowWidth+25){
             let x = this.vectorList[this.vectorList.length-1].x + this.vectorDist
             let y = noise((x + this.shift)*this.granularity)*this.scale + this.yOffset
-            this.vectorList.push(createVector(x, y))
+            this.vectorList.push(createVector(x, y))        
+            this.updateBuffer(); // Update the buffer when a new vertex is added
         }
 
-        for(let v of this.vectorList){
-            v.x -= this.scrollSpeed
+        // for(let v of this.vectorList){
+        //     v.x -= this.scrollSpeed
+        // }
+
+    }
+
+    updateBuffer() {
+        // Clear the buffer and redraw the terrain
+        this.buffer.clear();
+        this.buffer.fill(this.fillColor);
+        this.buffer.beginShape();
+        for (let v of this.vectorList) {
+            this.buffer.vertex(v.x, v.y);
         }
+        this.buffer.vertex(windowWidth, windowHeight);
+        this.buffer.vertex(0, windowHeight);
+        this.buffer.vertex(this.vectorList[0].x, this.vectorList[0].y);
+        this.buffer.endShape(CLOSE);
     }
 
     draw(){
-        stroke(this.strokeColor)
-        strokeWeight(2)
-        fill(this.fillColor)
-        beginShape(TESS)
-            for(let v of this.vectorList){
-                vertex(v.x, v.y)
-            }
-            vertex(windowWidth, windowHeight)
-            vertex(0, windowHeight)
-            vertex(this.vectorList[0].x, this.vectorList[0].y)
-        endShape(CLOSE)
+        image(this.buffer, this.buffPos.x, this.buffPos.y)
+        this.buffPos.x -= this.scrollSpeed
+        this.time += this.scrollSpeed
+        for(let v of this.vectorList){
+            v.x -= this.scrollSpeed
+        }
+        if(this.time % (this.scrollSpeed*this.frameOffset) == 0){
+            this.time = 0
+            console.log("updating terrain")
+            this.buffPos.x = windowWidth/2
+            this.updateTerrain()
+        }
     }
 }
 
