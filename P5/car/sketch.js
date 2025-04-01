@@ -4,6 +4,7 @@ let sun, sunPos, moon, moonPos;
 let cycleRadius;
 let basePath;
 let showAll = true
+let time = 0
 function preload(){
 
     if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
@@ -37,7 +38,7 @@ function setup()
     bgRoad1 = new Terrain(0.004, 600, 0, 1, color(80,50,40), color(150, 100, 65), 5)
     bgRoad2 = new Terrain(0.002, 400, 200, 2, color(112, 89, 70), color(173, 125, 85), 5)
     mainRoad = new Terrain(0.001, 200, 400, 5, color(100,60,50), color(190, 160, 125), 5)
-    fgRoad = new Terrain(0.001, 200, 500, 9, color(100,60,50), color(210, 180, 145), 5)
+    fgRoad = new Terrain(0.001, 200, 500, 9, color(112, 89, 70), color(173, 125, 85), 5)
 
 }
 
@@ -78,17 +79,19 @@ function draw()
     text("FPS: " + frameRate().toFixed(2), 50, 50)
 
     dayNightCycle();
+
+    time++
 }
 
 let timeOfDay = 0;
-let dayNightCycleSpeed = 0.5
+let dayNightCycleSpeed = 0.2
 let timeDirection = 1
 function dayNightCycle(){
     timeOfDay += dayNightCycleSpeed * timeDirection
     if(timeOfDay > 255 || timeOfDay < 0){
         timeDirection *= -1
     }
-    tintColor = lerpColor(color(255, 100, 50, 0), color(0, 0, 50, 150), map(timeOfDay, 0, 255, 0, 1));
+    tintColor = lerpColor(color(255, 100, 50, 0), color(0, 0, 50, 150), map(timeOfDay, 100, 150, 0, 1.0));
     fill(tintColor)
     rect(windowWidth/2, windowHeight/2, windowWidth, windowHeight)
 
@@ -110,7 +113,7 @@ class Terrain{
     }
 
     initTerrain(){
-        for(let x = -25; x < windowWidth+25; x+=this.vectorDist){
+        for(let x = -50; x < windowWidth+25; x+=this.vectorDist){
             let y = noise(x*this.granularity)*this.scale + this.yOffset
             this.vectorList.push(createVector(x, y))
         }
@@ -151,20 +154,32 @@ function mouseClicked(){
     showAll = !showAll
 }
 
+let carMidPoint = 25
 function drawCar(){
     //get angle between vert before and after car
-    vertA = mainRoad.vectorList[20]
-    vertB = mainRoad.vectorList[30]
+    vertA = mainRoad.vectorList[carMidPoint-5]
+    vertB = mainRoad.vectorList[carMidPoint+5]
     //line(vertA.x, vertA.y, vertB.x, vertB.y)
     let angle = atan2(vertB.y-vertA.y, vertB.x-vertA.x)
-    carPos = createVector(mainRoad.vectorList[25].x, mainRoad.vectorList[25].y-19)
+    carPos = createVector(mainRoad.vectorList[carMidPoint].x, mainRoad.vectorList[carMidPoint].y-19)
     
+    // if(time % 5 == 0){
+    //     console.log(time)
+    //     carMidPoint += 1
+    //     if(carMidPoint > mainRoad.vectorList.length-10){
+    //         carMidPoint = 5
+    //     }
+    // }
     //draw the car
     push()
         translate(carPos.x, carPos.y)
         rotate(angle)
         scale(-1, 1)
         image(car, 0, 0)
+        //the rgb code for yellow is (255, 255, 0)
+        // noStroke()
+        // fill(255, 255, 0)
+        // ellipse(-car.width/2+3, 5, 5, 5)
     pop()
 }
 
@@ -208,15 +223,23 @@ function windowResized()
     resizeCanvas(windowWidth, windowHeight);
 }
 
-let time = 0
 let particles = []
 function updateExhaust(){
-    particleSpawn = createVector(carPos.x-car.width/2, carPos.y+8)
     particleSize = 6
+    
     if(time % 15 == 0){
+        let exhaustOffset = createVector(-car.width/2,8)
+        let vertA = mainRoad.vectorList[20]
+        let vertB = mainRoad.vectorList[30]
+        let angle = atan2(vertB.y-vertA.y, vertB.x-vertA.x)
+        let rotatedExhaustOffset = createVector(
+            exhaustOffset.x * cos(angle) - exhaustOffset.y * sin(angle),
+            exhaustOffset.x * sin(angle) + exhaustOffset.y * cos(angle)
+        )
+        particleSpawn = createVector(carPos.x + rotatedExhaustOffset.x, carPos.y + rotatedExhaustOffset.y)
+    
         particles.push(new Particle(particleSpawn, particleSize))
     }
-    time++
 }
 function drawExhaust(){
     for(particle of particles){
