@@ -26,6 +26,7 @@ function draw()
 {
     time++;
     background("#21dbde")
+    background(0)
     ballList.forEach(ball => update(ball));
     particleList.forEach(particle => {
         particle.show()
